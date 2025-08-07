@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "*.ts",
+    "components/**/*.ts",
+    "components/**/*.tsx",
+    "app/**/*.ts",
+    "app/**/*.tsx",
+    "*.js",
+    "**/eslint.config.mjs",
+    "__tests__/**/*.ts",
+    "__tests__/**/*.tsx"
+  ]
+}

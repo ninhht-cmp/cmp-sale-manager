@@ -1,0 +1,7 @@
+.idea/
+.vscode
+.github
+.gitignore
+.env.example
+.next
+**/*/node_modules/
