@@ -3,11 +3,7 @@ import { fileURLToPath } from 'url';
 import { FlatCompat } from '@eslint/eslintrc';
 import js from '@eslint/js';
 import globals from 'globals';
-import tseslint from 'typescript-eslint';
-import importX from 'eslint-plugin-import-x';
-import security from 'eslint-plugin-security';
-import regexp from 'eslint-plugin-regexp';
-import reactESLint from '@eslint-react/eslint-plugin';
+import tsParser from '@typescript-eslint/parser';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -17,37 +13,36 @@ const compat = new FlatCompat({
 });
 
 const baseConfig = {
+  files: ['**/*.{js,jsx,ts,tsx}'],
   languageOptions: {
+    parser: tsParser,
     globals: {
       ...globals.browser,
       ...globals.node,
     },
-    ecmaVersion: 'latest',
+    ecmaVersion: 2020,
     sourceType: 'module',
     parserOptions: {
       ecmaFeatures: {
         jsx: true,
       },
-      project: './tsconfig.eslint.json',
-      tsconfigRootDir: __dirname,
-      warnOnUnsupportedTypeScriptVersion: false,
     },
   },
   linterOptions: {
     reportUnusedDisableDirectives: 'error',
   },
   settings: {
-    'import-x/resolver': {
+    'import/resolver': {
       typescript: {
         alwaysTryTypes: true,
         project: './tsconfig.eslint.json',
       },
       node: true,
     },
-    'import-x/cache': {
+    'import/cache': {
       lifetime: 5 * 60, // 5 minutes cache
     },
-    'import-x/extensions': ['.js', '.jsx', '.ts', '.tsx'],
+    'import/extensions': ['.js', '.jsx', '.ts', '.tsx'],
     react: {
       version: 'detect',
     },
@@ -57,53 +52,127 @@ const baseConfig = {
   },
 };
 
-const pluginConfigs = [
-  js.configs.recommended,
-  ...tseslint.configs.strictTypeChecked,
-  ...tseslint.configs.stylisticTypeChecked,
-  importX.flatConfigs.recommended,
-  importX.flatConfigs.typescript,
-  regexp.configs['flat/recommended'],
-  security.configs.recommended,
-  reactESLint.configs['recommended-type-checked'],
-
-  ...compat.extends(
-    'plugin:@next/next/core-web-vitals',
-    'plugin:@next/next/recommended',
-    'plugin:react-hooks/recommended',
-    'plugin:jsx-a11y/recommended',
-    'plugin:testing-library/react',
-  ),
-  ...compat.plugins('react-compiler'),
-];
-
-const eslintConfig = [
-  {
-    files: ['**/*.{js,jsx,ts,tsx}'],
-    rules: {},
+const testConfig = {
+  files: ['__tests__/**/*.{ts,tsx}'],
+  rules: {
+    '@typescript-eslint/no-explicit-any': 'off', // Disable no-explicit-any for test files
   },
-  {
-    files: [
-      '**/app/**/page.{js,jsx,ts,tsx}',
-      '**/app/**/layout.{js,jsx,ts,tsx}',
-      '**/app/**/loading.{js,jsx,ts,tsx}',
-      '**/app/**/error.{js,jsx,ts,tsx}',
-      '**/app/**/not-found.{js,jsx,ts,tsx}',
-      '**/app/**/global-error.{js,jsx,ts,tsx}',
-      '**/app/**/route.{js,ts}',
-      '**/app/**/default.{js,jsx,ts,tsx}',
-      '**/app/**/template.{js,jsx,ts,tsx}',
-      '**/pages/**/*.{js,jsx,ts,tsx}',
-      '**/middleware.{js,ts}',
-      'next.config.{js,ts}',
+};
+
+const mainRulesConfig = {
+  files: ['**/*.{js,jsx,ts,tsx}'],
+  rules: {
+    'unused-imports/no-unused-imports': 'error',
+    curly: ['error', 'all'],
+    'import/no-cycle': ['error', { ignoreExternal: false, maxDepth: 3 }],
+    'import/no-anonymous-default-export': 'off',
+    'react/prop-types': 0,
+    'react/require-default-props': 0,
+    'react/no-unused-prop-types': 0,
+    'react/jsx-no-target-blank': 0,
+    'import/prefer-default-export': 0,
+    'react/jsx-props-no-spreading': 0,
+    'jsx-a11y/anchor-is-valid': 0,
+    'react/no-danger': 0,
+    '@typescript-eslint/return-await': 0,
+    '@typescript-eslint/consistent-type-imports': 'error',
+    '@typescript-eslint/no-unused-vars': 'off',
+    'no-restricted-globals': [
+      'error',
+      {
+        name: 'isFinite',
+        message:
+          'Use Number.isFinite instead https://github.com/airbnb/javascript#standard-library--isfinite',
+      },
+      {
+        name: 'isNaN',
+        message:
+          'Use Number.isNaN instead https://github.com/airbnb/javascript#standard-library--isnan',
+      },
+      'addEventListener',
+      'blur',
+      'close',
+      'closed',
+      'confirm',
+      'defaultStatus',
+      'defaultstatus',
+      'event',
+      'external',
+      'find',
+      'focus',
+      'frameElement',
+      'frames',
+      'history',
+      'innerHeight',
+      'innerWidth',
+      'length',
+      'location',
+      'locationbar',
+      'menubar',
+      'moveBy',
+      'moveTo',
+      'name',
+      'onblur',
+      'onerror',
+      'onfocus',
+      'onload',
+      'onresize',
+      'onunload',
+      'open',
+      'opener',
+      'opera',
+      'origin',
+      'outerHeight',
+      'outerWidth',
+      'pageXOffset',
+      'pageYOffset',
+      'parent',
+      'print',
+      'removeEventListener',
+      'resizeBy',
+      'resizeTo',
+      'screen',
+      'screenLeft',
+      'screenTop',
+      'screenX',
+      'screenY',
+      'scroll',
+      'scrollbars',
+      'scrollBy',
+      'scrollTo',
+      'scrollX',
+      'scrollY',
+      'self',
+      'status',
+      'statusbar',
+      'stop',
+      'toolbar',
+      'top',
     ],
-    rules: {
-      'import-x/no-default-export': 'off',
-      'import-x/prefer-default-export': 'error',
-      '@eslint-react/no-missing-component-display-name': 'off',
-    },
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: 'date-fns',
+            importNames: ['isWeekend'],
+            message: 'Please import from src/common instead.',
+          },
+          {
+            name: 'next/link',
+            message: 'Please import from src/common instead.',
+          },
+          {
+            name: 'react-router-dom',
+            importNames: ['Link'],
+            message: 'Please import from src/common instead.',
+          },
+        ],
+      },
+    ],
+    '@typescript-eslint/explicit-module-boundary-types': 'off',
   },
-];
+};
 
 const ignorePatterns = {
   ignores: [
@@ -112,6 +181,7 @@ const ignorePatterns = {
     'dist/**',
     'build/**',
     'coverage/**',
+    'storybook-static/**',
     'node_modules/**',
     'public/**',
     '*.min.js',
@@ -120,28 +190,25 @@ const ignorePatterns = {
     '.vscode/**',
     '.idea/**',
     '.DS_Store',
-    'Thumbs.db',
-    '*.log',
-    'logs/**',
-    '.env*',
-    'certificates/**',
-    '*.pem',
-    '*.key',
-    '*.crt',
-    '.cache/**',
-    '.temp/**',
-    '.tmp/**',
-    '.DS_Store',
     '.DS_Store?',
     '._*',
     '.Spotlight-V100',
     '.Trashes',
     'ehthumbs.db',
     'Thumbs.db',
+    '*.log',
+    'logs/**',
+    '.cache/**',
+    '.temp/**',
+    '.tmp/**',
+    '.env*',
+    'certificates/**',
+    '*.pem',
+    '*.key',
+    '*.crt',
     'pnpm-lock.yaml',
     'yarn.lock',
     'package-lock.json',
-    'storybook-static/**',
     'test-results/**',
     'playwright-report/**',
     'cypress/downloads/**',
@@ -150,4 +217,26 @@ const ignorePatterns = {
   ],
 };
 
-export default [baseConfig, ...pluginConfigs, ...eslintConfig, ignorePatterns];
+const config = [
+  js.configs.recommended,
+
+  ...compat.extends(
+    'next/core-web-vitals',
+    'next/typescript',
+    'prettier',
+    'plugin:prettier/recommended',
+    'plugin:react/recommended',
+    'plugin:react-hooks/recommended',
+    'plugin:testing-library/react',
+    'plugin:jest-dom/recommended',
+  ),
+
+  ...compat.plugins('prettier', 'unused-imports', 'react-hooks'),
+
+  ignorePatterns,
+  baseConfig,
+  mainRulesConfig,
+  testConfig,
+];
+
+export default config;

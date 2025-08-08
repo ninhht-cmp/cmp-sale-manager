@@ -1,0 +1,7 @@
+Sitemap: https://v2-api.commacpro.com/sitemap.txt
+User-agent: *
+Disallow: /join
+Disallow: /error
+Disallow: /callback
+Disallow: /helloworld
+Disallow: /helloworld/
