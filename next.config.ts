@@ -89,7 +89,7 @@ const nextConfig: NextConfig = {
   },
 
   poweredByHeader: false,
-  reactStrictMode: false,
+  reactStrictMode: true,
   productionBrowserSourceMaps: process.env.SOURCE_MAPS === 'true',
 };
 

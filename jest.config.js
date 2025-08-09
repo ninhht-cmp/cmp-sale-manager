@@ -12,6 +12,7 @@ module.exports = {
   moduleNameMapper: {
     '\\.svg$': '<rootDir>/__mocks__/svgrMock.ts',
     '\\.css$': 'identity-obj-proxy',
+    'react-markdown': '<rootDir>/__mocks__/reactMarkdownMock.tsx',
     'react-turnstile': 'identity-obj-proxy',
   },
 };

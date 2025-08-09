@@ -1,5 +1,5 @@
-import type { ComponentProps, ReactElement, ReactNode } from 'react';
-import React, { Children } from 'react';
+import type { ComponentProps, ReactElement } from 'react';
+import React from 'react';
 import classNames from 'classnames';
 
 export enum IconSize {
@@ -30,17 +30,17 @@ export const iconSizeClasses: Record<IconSize, string> = {
   [IconSize.Enormous]: 'w-20 h-20', // 80px
 };
 
-export type IconItemType = React.ComponentType<{ className?: string }>;
+export type IconItemType = React.ComponentType<{ className: string }>;
 
 export interface IconProps extends ComponentProps<'svg'> {
   secondary?: boolean;
   size?: IconSize;
 }
 
-interface Props extends IconProps {
+type Props = IconProps & {
   IconPrimary: IconItemType;
   IconSecondary: IconItemType;
-}
+};
 
 const Icon = ({
   secondary = false,
@@ -61,34 +61,6 @@ const Icon = ({
       )}
       {...rest}
     />
-  );
-};
-
-export const IconWrapper = ({
-  size,
-  wrapperClassName,
-  children,
-  ...rest
-}: Omit<IconProps, 'className'> & {
-  wrapperClassName?: string;
-  children: ReactNode;
-}): ReactElement => {
-  return (
-    <div className={wrapperClassName}>
-      {Children.map(children, (child) => {
-        if (React.isValidElement<Props>(child)) {
-          const { className = '' } = rest as { className?: string };
-
-          return React.cloneElement(child, {
-            ...child.props,
-            size,
-            className: classNames(child.props.className, className),
-          });
-        }
-
-        return child;
-      })}
-    </div>
   );
 };
 

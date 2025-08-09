@@ -14,6 +14,10 @@
     "__tests__/**/*.ts",
     "__tests__/**/*.tsx",
     "__mocks__/**/*.ts",
-    "__mocks__/**/*.tsx"
+    "__mocks__/**/*.tsx",
+    "tests/**/*.ts",
+    "tests/**/*.tsx",
+    "*.config.ts",
+    "*.config.js"
   ]
 }

@@ -7,8 +7,10 @@ import nodeFetch from 'node-fetch';
 import { storageWrapper as storage } from '~/lib/storageWrapper';
 import { structuredCloneJsonPolyfill } from '~/lib/structuredClone';
 
-// process.env.NEXT_PUBLIC_API_URL = 'http://localhost:3000/';
-// process.env.NEXT_PUBLIC_APP_URL = '/';
+process.env.NEXT_PUBLIC_API_URL = 'http://localhost:3000/';
+process.env.NEXT_PUBLIC_APP_URL = '/';
+
+global.fetch = nodeFetch as any as typeof fetch;
 
 jest.mock('next/dynamic', () => (func: () => Promise<any>) => {
   let component: any = null;
@@ -21,7 +23,28 @@ jest.mock('next/dynamic', () => (func: () => Promise<any>) => {
   return DynamicComponent;
 });
 
-global.fetch = nodeFetch as any as typeof fetch;
+jest.mock('next/router', () => ({
+  useRouter: jest.fn().mockImplementation(
+    () =>
+      ({
+        query: {},
+        push: jest.fn(),
+        pathname: '/',
+      }) as unknown as NextRouter,
+  ),
+}));
+
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: jest.fn(),
+    replace: jest.fn(),
+    refresh: jest.fn(),
+    back: jest.fn(),
+    forward: jest.fn(),
+  }),
+  usePathname: () => '',
+  useSearchParams: () => new URLSearchParams(),
+}));
 
 Object.defineProperty(global, 'IntersectionObserver', {
   writable: true,
@@ -80,29 +103,6 @@ Object.defineProperty(global, 'ResizeObserver', {
     trigger: jest.fn(),
   })),
 });
-
-jest.mock('next/router', () => ({
-  useRouter: jest.fn().mockImplementation(
-    () =>
-      ({
-        query: {},
-        push: jest.fn(),
-        pathname: '/',
-      }) as unknown as NextRouter,
-  ),
-}));
-
-jest.mock('next/navigation', () => ({
-  useRouter: () => ({
-    push: jest.fn(),
-    replace: jest.fn(),
-    refresh: jest.fn(),
-    back: jest.fn(),
-    forward: jest.fn(),
-  }),
-  usePathname: () => '',
-  useSearchParams: () => new URLSearchParams(),
-}));
 
 beforeEach(() => {
   clear();
